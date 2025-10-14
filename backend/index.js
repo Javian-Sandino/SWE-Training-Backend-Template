@@ -1,25 +1,56 @@
+
 // index.js is the entry point of your backend application.
-// It sets up the Express server, connects to the MongoDB database,
-// and configures the Apollo GraphQL server.
+// It starts a minimal Apollo Server + Express instance so you can run the
+// backend locally for verification even if MongoDB config is not present.
 
+// Load environment variables from .env (if present). Do this before any other
+// module that reads process.env.
+try {
+	require('dotenv').config();
+} catch (e) {
+	// If dotenv isn't installed yet, we'll continue and the env vars can still be
+	// provided by the shell. This try/catch avoids hard failing during setup.
+}
 
-/*
-
-//this is calling all the libraries and APIs we will be using
 const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
 const mongoose = require('mongoose');
 
-// Import your MongoDB connection URI from the config file.
-const { MONGODB_URI } = require('./config');
-
-// Import the GraphQL schema definitions and resolvers.
 const typeDefs = require('./graphql/TypeDefs');
 const resolvers = require('./graphql/resolvers');
 
-// Initialize the Express and Apollo Server instances.
-// Then start the server with a function
+const PORT = process.env.PORT || 4000;
 
+async function startServer() {
+	const app = express();
 
-*/
+	const apolloServer = new ApolloServer({ typeDefs, resolvers });
+	await apolloServer.start();
+	apolloServer.applyMiddleware({ app, path: '/graphql' });
+
+	// Attempt to connect to MongoDB if config provides a URI, but don't fail if not set.
+	try {
+		// eslint-disable-next-line global-require
+		const { MONGODB_URI } = require('./config');
+		if (MONGODB_URI) {
+			mongoose.set('strictQuery', false);
+			await mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+			console.log('Connected to MongoDB');
+		}
+	} catch (err) {
+		console.log('MongoDB not configured or connection failed (continuing without DB):', err.message || err);
+	}
+
+	app.get('/', (req, res) => res.send('Backend is running. GraphQL at /graphql'));
+
+	app.listen(PORT, () => {
+		console.log(`Server ready at http://localhost:${PORT}${apolloServer.graphqlPath}`);
+	});
+}
+
+startServer().catch(err => {
+	console.error('Failed to start server:', err);
+	process.exit(1);
+});
+
 
