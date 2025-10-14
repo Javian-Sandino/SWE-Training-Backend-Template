@@ -1,43 +1,89 @@
-// graphql/TypeDefs.js
-// specifies the types, queries, and mutations
-
+// backend/graphql/TypeDefs.js
 const { gql } = require('apollo-server-express');
 
-// The `gql` tag is used to parse the schema string.
-// This is where you define the structure of your data.
-
-//REMEMBER:
-
-// An object type represents a kind of object you can fetch from your project.
-//  which defines the fields and their data types.
-// type Artist {
-    //     id: ID!
-    //     name: String!
-    //     genre: String
- // }
-
- //The Query type defines all the available queries / data grabbing operations
-    //  query GetHeroName {
-    //   hero {
-    //     name
-    //   }
-    // }
-
- // The Mutation type defines all the available mutations aka the changes the users can make to the data
-
-//  type Mutation {
-//   updateHumanName(id: ID!, name: String!): Human
-// }
-
 const typeDefs = gql`
+    scalar Date
 
-    # write your code here!
+    type User {
+        id: ID!
+        username: String!
+        email: String!
+        role: String
+        profile: Profile
+        createdAt: Date
+        updatedAt: Date
+    }
 
+    type Profile {
+        name: String
+        bio: String
+    }
 
-    # You can add more types, queries, and mutations here.
-    # For example, if you have a 'Post' and 'User' type:
-    # type Post { ... }
-    # type User { ... }
+    type Transaction {
+        id: ID!
+        type: String!
+        amount: Float!
+        date: Date!
+        merchant: String
+        category: String
+        notes: String
+        tags: [String]
+        createdAt: Date
+        updatedAt: Date
+    }
+
+    type Budget {
+        id: ID!
+        month: String!
+        category: String!
+        limit: Float!
+        notes: String
+        createdAt: Date
+        updatedAt: Date
+    }
+
+    type Query {
+        hello: String
+        users: [User!]
+        transactions(category: String, type: String, month: String): [Transaction!]
+        budgets(month: String): [Budget!]
+    }
+
+    input ProfileInput {
+        name: String
+        bio: String
+    }
+
+    input CreateUserInput {
+        username: String!
+        email: String!
+        passwordHash: String
+        role: String
+        profile: ProfileInput
+    }
+
+    input CreateTransactionInput {
+        type: String!
+        amount: Float!
+        date: String!
+        merchant: String
+        category: String
+        notes: String
+        tags: [String]
+    }
+
+    input CreateBudgetInput {
+        month: String!
+        category: String!
+        limit: Float!
+        notes: String
+    }
+
+    type Mutation {
+        createUser(input: CreateUserInput!): User!
+        createTransaction(input: CreateTransactionInput!): Transaction!
+        createBudget(input: CreateBudgetInput!): Budget!
+    }
 `;
 
 module.exports = typeDefs;
