@@ -1,14 +1,12 @@
-// this file is the blueprint for the data stored in the obj's collection
+// backend/models/TypeName.js
+// Example placeholder model. Replace with real models for your app.
 
-const {model, Schema } = require('mongoose');
+const { model, Schema } = require('mongoose');
 
+const TypeNameSchema = new Schema({
+    field1: { type: String },
+    field2: { type: String }
+}, { timestamps: true });
 
-/*const TypeNameSchema = new Schema({
-    field1: String,
-    field2: String
-});*/
-
-// Create and export the model.
-// automatically creates a collection named whatever the TypeNameSchema is called
-module.exports = model('Type Name', TypeNameSchema);
+module.exports = model('TypeName', TypeNameSchema);
 

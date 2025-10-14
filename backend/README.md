@@ -14,6 +14,38 @@ Before starting out, it is important to handle these next steps:
 - If you have not done so already, open a terminal command and run "npm install" in the folder where the package.json and package-lock.json are located. This will install all the dependencies you may need 
 *(note: if you decide to implement something extra, you will have to npm install said dependencies)* But for now this should be enough to get the backend running!
 
+Environment variables (.env)
+-----------------------------
+This project reads `MONGODB_URI` from the environment. You can either export it in your shell or create a local `.env` file in the `backend/` folder and the app will load it using `dotenv`.
+
+Example `.env` (DO NOT COMMIT this file):
+
+MONGODB_URI="mongodb+srv://<user>:<password>@cluster0.b29aetw.mongodb.net/mydb?retryWrites=true&w=majority"
+
+To install `dotenv` and run the server:
+
+```bash
+cd backend
+npm install
+npm install dotenv --save
+# Start the server (ensure MONGODB_URI is set in .env or in your shell):
+npm start
+```
+
+Once running, open the GraphQL playground at http://localhost:4000/graphql and run a quick test query:
+
+{
+	hello
+}
+
+Expected response:
+
+{
+	"data": {
+		"hello": "Hello from the backend!"
+	}
+}
+
 ---
 ## About the Files
 ## index.js
@@ -34,6 +66,15 @@ the blueprints for all the data you will store in your database
 
 ### TypeName.js
 tells MongoDB exactly what each piece of data should look like, what information it should contain and what type of data those fields should be (like a String, or a Number).
+
+### User.js
+Defines user accounts for the application. Fields include `username`, `email`, `passwordHash`, `role`, and an optional `profile` object.
+
+### Transaction.js
+Model for income/expense transactions. Fields: `type` (INCOME|EXPENSE), `amount`, `date`, `merchant`, `category`, `notes`, and `tags`.
+
+### Budget.js
+Monthly budget entries by category. Fields: `month` (e.g. "2025-10"), `category`, `limit`, and optional `notes`.
 
 ## graphql Folder
 
