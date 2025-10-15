@@ -1,14 +1,41 @@
 import React from 'react'
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import Budgets from './components/Budgets'
 import CreateBudget from './components/CreateBudget'
+import Transactions from './pages/Transactions'
+import Users from './pages/Users'
+import './styles.css'
+
+function Layout({ children }){
+  return (
+    <div className="app-root">
+      <nav className="topnav">
+        <h1>MoneyTracker</h1>
+        <div className="navlinks">
+          <Link to="/">Dashboard</Link>
+          <Link to="/transactions">Transactions</Link>
+          <Link to="/users">Users</Link>
+        </div>
+      </nav>
+      <main className="container">{children}</main>
+    </div>
+  )
+}
 
 export default function App(){
   return (
-    <div style={{padding:20,fontFamily:'Arial'}}>
-      <h1>MoneyTracker - Frontend</h1>
-      <CreateBudget />
-      <hr />
-      <Budgets />
-    </div>
+    <BrowserRouter>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<>
+            <CreateBudget />
+            <hr />
+            <Budgets />
+          </>} />
+          <Route path="/transactions" element={<Transactions />} />
+          <Route path="/users" element={<Users />} />
+        </Routes>
+      </Layout>
+    </BrowserRouter>
   )
 }

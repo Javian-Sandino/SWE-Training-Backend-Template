@@ -13,6 +13,18 @@ const CREATE_BUDGET = gql`
   }
 `
 
+const GET_BUDGETS = gql`
+  query GetBudgets($month: String){
+    budgets(month: $month){
+      id
+      month
+      category
+      limit
+      notes
+    }
+  }
+`
+
 export default function CreateBudget(){
   const [month, setMonth] = useState('2025-10')
   const [category, setCategory] = useState('Groceries')
@@ -20,9 +32,25 @@ export default function CreateBudget(){
   const [notes, setNotes] = useState('')
 
   const [createBudget, { data, loading, error }] = useMutation(CREATE_BUDGET, {
-    onCompleted(){
-      // naive, could use cache update
-      window.location.reload()
+    // update the Apollo cache so the Budgets list updates instantly
+    update(cache, { data: { createBudget } }){
+      try{
+        const existing = cache.readQuery({ query: GET_BUDGETS, variables: { month: null } })
+        if(existing?.budgets){
+          cache.writeQuery({
+            query: GET_BUDGETS,
+            variables: { month: null },
+            data: { budgets: [createBudget, ...existing.budgets] }
+          })
+        }
+      }catch(err){
+        // no-op: cache may be empty, write initial value
+        cache.writeQuery({
+          query: GET_BUDGETS,
+          variables: { month: null },
+          data: { budgets: [createBudget] }
+        })
+      }
     }
   })
 
