@@ -33,8 +33,15 @@ async function startServer() {
 		// eslint-disable-next-line global-require
 		const { MONGODB_URI } = require('./config');
 		if (MONGODB_URI) {
-			mongoose.set('strictQuery', false);
-			await mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+						mongoose.set('strictQuery', false);
+						// Set reasonable timeouts so failed connections return quickly in dev
+						const connectOptions = {
+							// these options are for the underlying driver; some mongoose options are deprecated
+							serverSelectionTimeoutMS: 5000, // 5s to find a primary
+							socketTimeoutMS: 45000,
+							connectTimeoutMS: 5000,
+						};
+						await mongoose.connect(MONGODB_URI, connectOptions);
 			console.log('Connected to MongoDB');
 		}
 	} catch (err) {

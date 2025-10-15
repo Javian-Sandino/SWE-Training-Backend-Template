@@ -1,7 +1,15 @@
 // backend/graphql/resolvers/index.js
+const mongoose = require('mongoose');
 const User = require('../../models/User');
 const Transaction = require('../../models/Transaction');
 const Budget = require('../../models/Budget');
+
+function ensureDbConnected(){
+    // mongoose.connection.readyState === 1 means connected
+    if(mongoose.connection.readyState !== 1){
+        throw new Error('Database not connected')
+    }
+}
 
 module.exports = {
         Query: {
@@ -33,12 +41,14 @@ module.exports = {
 
         Mutation: {
                 createUser: async (_, { input }) => {
+                    ensureDbConnected();
                     const user = new User(input);
                     const saved = await user.save();
                     const d = saved.toObject();
                     return { id: d._id.toString(), ...d };
                 },
                 createTransaction: async (_, { input }) => {
+                    ensureDbConnected();
                     const tx = new Transaction({
                         ...input,
                         date: new Date(input.date)
@@ -48,10 +58,11 @@ module.exports = {
                     return { id: d._id.toString(), ...d };
                 },
                 createBudget: async (_, { input }) => {
-                        const b = new Budget(input);
-                                const saved = await b.save();
-                                const d = saved.toObject();
-                                return { id: d._id.toString(), ...d };
+                    ensureDbConnected();
+                    const b = new Budget(input);
+                    const saved = await b.save();
+                    const d = saved.toObject();
+                    return { id: d._id.toString(), ...d };
                 }
         }
 };
