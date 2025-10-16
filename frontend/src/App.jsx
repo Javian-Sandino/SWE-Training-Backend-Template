@@ -12,7 +12,7 @@ function Layout({ children }){
       <nav className="topnav">
         <h1>MoneyTracker</h1>
         <div className="navlinks">
-          <Link to="/">Dashboard</Link>
+          <Link to="/dashboard">Dashboard</Link>
           <Link to="/transactions">Transactions</Link>
           <Link to="/users">Users</Link>
         </div>
@@ -32,6 +32,7 @@ export default function App(){
             <hr />
             <Budgets />
           </>} />
+          <Route path="/dashboard" element={<Dashboard/>} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/users" element={<Users />} />
         </Routes>

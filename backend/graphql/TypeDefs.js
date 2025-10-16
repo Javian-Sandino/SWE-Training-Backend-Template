@@ -47,6 +47,15 @@ const typeDefs = gql`
         total: Float
     }
 
+    type BudgetProgress {
+        id: ID!
+        month: String!
+        category: String!
+        limit: Float!
+        spent: Float!
+        percentUsed: Float!
+    }
+
     type PaginatedTransactions {
         items: [Transaction!]
         total: Int
@@ -63,6 +72,8 @@ const typeDefs = gql`
         budget(id: ID!): Budget
         totalsByMonth(month: String!): Float
         totalsByCategory(month: String): [CategoryTotal!]
+        budgetsProgress(month: String): [BudgetProgress!]
+        budgetAlerts(thresholdPercent: Float = 0.9, month: String): [BudgetProgress!]
     }
 
     input ProfileInput {

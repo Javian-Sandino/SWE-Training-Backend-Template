@@ -84,6 +84,32 @@ module.exports = {
                 ]);
                 return res.map(r => ({ category: r.category, total: r.total }));
             }
+            ,
+            budgetsProgress: async (_, { month }) => {
+                // get budgets for month (or all if not provided)
+                const budgetFilter = {};
+                if (month) budgetFilter.month = month;
+                const budgets = await Budget.find(budgetFilter).lean();
+
+                // for each budget, compute spent amount from transactions in that month/category
+                const results = await Promise.all(budgets.map(async b => {
+                    const [year, m] = b.month.split('-').map(Number);
+                    const start = new Date(year, m - 1, 1);
+                    const end = new Date(year, m, 1);
+                    const agg = await Transaction.aggregate([
+                        { $match: { category: b.category, date: { $gte: start, $lt: end } } },
+                        { $group: { _id: null, total: { $sum: { $cond: [{ $eq: ['$type', 'INCOME'] }, '$amount', { $multiply: ['$amount', -1] }] } } } }
+                    ]);
+                    const spent = agg[0]?.total ? Math.abs(agg[0].total) : 0;
+                    const percentUsed = b.limit > 0 ? Math.min(1, spent / b.limit) : 0;
+                    return { id: b._id.toString(), month: b.month, category: b.category, limit: b.limit, spent, percentUsed };
+                }));
+                return results;
+            },
+            budgetAlerts: async (_, { thresholdPercent = 0.9, month }) => {
+                const prog = await module.exports.Query.budgetsProgress(_, { month });
+                return prog.filter(p => p.percentUsed >= thresholdPercent);
+            }
         },
 
         Mutation: {
