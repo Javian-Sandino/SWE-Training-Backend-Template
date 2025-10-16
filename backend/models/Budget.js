@@ -13,4 +13,8 @@ const BudgetSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+
+// compound index to ensure unique monthly budget per category if desired
+BudgetSchema.index({ month: 1, category: 1 }, { unique: false });
+
 module.exports = mongoose.model('Budget', BudgetSchema);

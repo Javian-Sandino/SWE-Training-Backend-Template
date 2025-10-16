@@ -16,4 +16,8 @@ const TransactionSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// compound index for analytics
+TransactionSchema.index({ date: -1, category: 1 });
+TransactionSchema.index({ tags: 1 });
+
 module.exports = mongoose.model('Transaction', TransactionSchema);
