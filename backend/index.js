@@ -32,6 +32,16 @@ async function startServer() {
 	try {
 		// eslint-disable-next-line global-require
 		const { MONGODB_URI } = require('./config');
+
+		// Helpful startup logging: show whether a MongoDB URI is configured (mask it for safety).
+		function maskUri(uri) {
+			if (!uri) return '';
+			// show protocol and host tail only, mask credentials
+			return uri.replace(/:(\/\/)([^@]+)@/, ':$1*****@');
+		}
+
+		console.log('MONGODB_URI configured:', Boolean(MONGODB_URI), maskUri(MONGODB_URI));
+
 		if (MONGODB_URI) {
 			mongoose.set('strictQuery', false);
 			await mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
