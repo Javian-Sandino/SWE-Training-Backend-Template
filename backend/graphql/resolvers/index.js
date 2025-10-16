@@ -7,8 +7,13 @@ module.exports = {
         Query: {
             hello: () => 'Hello from the backend! 🎉',
             users: async () => {
-                const docs = await User.find().lean();
-                return docs.map(d => ({ id: d._id.toString(), ...d }));
+                try {
+                    const docs = await User.find().lean();
+                    return docs.map(d => ({ id: d._id.toString(), ...d }));
+                } catch (err) {
+                    console.error('Failed to fetch users from DB:', err.message || err);
+                    return [];
+                }
             },
             transactions: async (_, args) => {
                 const filter = {};
@@ -20,14 +25,24 @@ module.exports = {
                     const end = new Date(year, month, 1);
                     filter.date = { $gte: start, $lt: end };
                 }
-                const docs = await Transaction.find(filter).sort({ date: -1 }).lean();
-                return docs.map(d => ({ id: d._id.toString(), ...d }));
+                try {
+                    const docs = await Transaction.find(filter).sort({ date: -1 }).lean();
+                    return docs.map(d => ({ id: d._id.toString(), ...d }));
+                } catch (err) {
+                    console.error('Failed to fetch transactions from DB:', err.message || err);
+                    return [];
+                }
             },
             budgets: async (_, args) => {
                 const filter = {};
                 if (args.month) filter.month = args.month;
-                const docs = await Budget.find(filter).lean();
-                return docs.map(d => ({ id: d._id.toString(), ...d }));
+                try {
+                    const docs = await Budget.find(filter).lean();
+                    return docs.map(d => ({ id: d._id.toString(), ...d }));
+                } catch (err) {
+                    console.error('Failed to fetch budgets from DB:', err.message || err);
+                    return [];
+                }
             }
         },
 
