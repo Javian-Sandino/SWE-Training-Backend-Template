@@ -1,6 +1,6 @@
 // frontend/src/context/AuthContext.jsx
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { gql, useMutation, useLazyQuery } from '@apollo/client';
 
 const LOGIN_MUTATION = gql`
   mutation Login($input: LoginInput!) {
@@ -31,6 +31,20 @@ const REGISTER_MUTATION = gql`
           name
           bio
         }
+      }
+    }
+  }
+`;
+
+const GET_CURRENT_USER = gql`
+  query GetCurrentUser {
+    me {
+      id
+      username
+      email
+      profile {
+        name
+        bio
       }
     }
   }
@@ -81,6 +95,7 @@ const authReducer = (state, action) => {
       return {
         ...state,
         token: action.payload.token,
+        user: action.payload.user || null,
         isAuthenticated: !!action.payload.token,
         loading: false
       };
@@ -101,15 +116,39 @@ export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
   const [loginMutation] = useMutation(LOGIN_MUTATION);
   const [registerMutation] = useMutation(REGISTER_MUTATION);
+  const [getCurrentUser] = useLazyQuery(GET_CURRENT_USER);
 
   useEffect(() => {
     // Check for existing token on app load
     const token = localStorage.getItem('token');
-    dispatch({ 
-      type: 'INITIALIZE_AUTH', 
-      payload: { token } 
-    });
-  }, []);
+    if (token) {
+      // If we have a token, fetch the current user
+      getCurrentUser()
+        .then(({ data }) => {
+          dispatch({ 
+            type: 'INITIALIZE_AUTH', 
+            payload: { 
+              token, 
+              user: data?.me 
+            } 
+          });
+        })
+        .catch((error) => {
+          console.error('Failed to fetch current user:', error);
+          // If token is invalid, remove it
+          localStorage.removeItem('token');
+          dispatch({ 
+            type: 'INITIALIZE_AUTH', 
+            payload: { token: null } 
+          });
+        });
+    } else {
+      dispatch({ 
+        type: 'INITIALIZE_AUTH', 
+        payload: { token: null } 
+      });
+    }
+  }, [getCurrentUser]);
 
   const login = async (email, password) => {
     try {

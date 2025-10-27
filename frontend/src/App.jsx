@@ -2,10 +2,9 @@ import React from 'react'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import Auth from './components/Auth'
-import Budgets from './components/Budgets'
-import CreateBudget from './components/CreateBudget'
+import BudgetDashboard from './components/BudgetDashboard'
+import AnalyticsDashboard from './components/AnalyticsDashboard'
 import Transactions from './pages/Transactions'
-import Users from './pages/Users'
 import './styles.css'
 
 function Layout({ children }){
@@ -16,9 +15,10 @@ function Layout({ children }){
       <nav className="topnav">
         <h1>MoneyTracker</h1>
         <div className="navlinks">
-          <Link to="/">Dashboard</Link>
-          <Link to="/transactions">Transactions</Link>
-          <Link to="/users">Users</Link>
+          <Link to="/">📊 Dashboard</Link>
+          <Link to="/budgets">💰 Budgets</Link>
+          <Link to="/transactions">💳 Transactions</Link>
+          <Link to="/analytics">📈 Analytics</Link>
         </div>
         <div className="user-info">
           {user && (
@@ -55,13 +55,10 @@ export default function App(){
     <BrowserRouter>
       <Layout>
         <Routes>
-          <Route path="/" element={<>
-            <CreateBudget />
-            <hr />
-            <Budgets />
-          </>} />
+          <Route path="/" element={<AnalyticsDashboard />} />
+          <Route path="/budgets" element={<BudgetDashboard />} />
           <Route path="/transactions" element={<Transactions />} />
-          <Route path="/users" element={<Users />} />
+          <Route path="/analytics" element={<AnalyticsDashboard />} />
         </Routes>
       </Layout>
     </BrowserRouter>
