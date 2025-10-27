@@ -84,43 +84,6 @@ const typeDefs = gql`
         updatedAt: Date
     }
 
-    type MonthlyTrend {
-        year: Int!
-        month: Int!
-        type: String!
-        total: Float!
-        count: Int!
-    }
-
-    type CategoryBreakdown {
-        type: String!
-        category: String!
-        total: Float!
-        count: Int!
-        avgAmount: Float!
-    }
-
-    type BudgetInsight {
-        month: String!
-        spending: [CategorySpending!]!
-    }
-
-    type CategorySpending {
-        category: String!
-        total: Float!
-        avgTransaction: Float!
-        count: Int!
-    }
-
-    type DashboardStats {
-        totalIncome: Float!
-        totalExpenses: Float!
-        netIncome: Float!
-        budgetUtilization: Float!
-        topCategories: [CategoryBreakdown!]!
-        monthlyComparison: Float!
-    }
-
     type AuthPayload {
         token: String!
         user: User!
@@ -141,16 +104,6 @@ const typeDefs = gql`
         # Category queries
         categories: CategoryData!
         subcategories(type: String!, category: String!): [String!]!
-        
-        # Analytics queries
-        monthlyTrends(months: Int): [MonthlyTrend!]!
-        categoryBreakdown(startDate: String!, endDate: String!): [CategoryBreakdown!]!
-        budgetInsights(month: String!): [BudgetInsight!]!
-        dashboardStats(month: String!): DashboardStats!
-        
-        # Advanced analytics
-        spendingTrends(category: String, months: Int): [MonthlyTrend!]!
-        budgetPerformance(months: Int): [Budget!]!
     }
 
     input ProfileInput {

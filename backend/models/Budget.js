@@ -142,54 +142,7 @@ BudgetSchema.statics.getBudgetProgress = async function(userId, month) {
   });
 };
 
-// Static method to get budget insights
-BudgetSchema.statics.getBudgetInsights = async function(userId, currentMonth) {
-  const Transaction = mongoose.model('Transaction');
-  
-  // Get previous 3 months for comparison
-  const months = [];
-  const currentDate = new Date(currentMonth + '-01');
-  
-  for (let i = 0; i < 3; i++) {
-    const date = new Date(currentDate);
-    date.setMonth(date.getMonth() - i);
-    months.push(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`);
-  }
-  
-  const insights = [];
-  
-  // Get spending trends for each category
-  for (const month of months) {
-    const [year, monthNum] = month.split('-').map(Number);
-    const startDate = new Date(year, monthNum - 1, 1);
-    const endDate = new Date(year, monthNum, 0, 23, 59, 59);
-    
-    const categorySpending = await Transaction.aggregate([
-      {
-        $match: {
-          userId: new mongoose.Types.ObjectId(userId),
-          type: 'EXPENSE',
-          date: { $gte: startDate, $lte: endDate }
-        }
-      },
-      {
-        $group: {
-          _id: '$category',
-          total: { $sum: '$amount' },
-          avgTransaction: { $avg: '$amount' },
-          count: { $sum: 1 }
-        }
-      }
-    ]);
-    
-    insights.push({
-      month,
-      spending: categorySpending
-    });
-  }
-  
-  return insights;
-};
+
 
 // Compound unique index to prevent duplicate budgets
 BudgetSchema.index({ userId: 1, month: 1, category: 1 }, { unique: true });

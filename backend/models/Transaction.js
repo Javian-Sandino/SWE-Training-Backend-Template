@@ -113,58 +113,6 @@ TransactionSchema.pre('save', function(next) {
   next();
 });
 
-// Static methods for analytics
-TransactionSchema.statics.getMonthlyTrends = function(userId, months = 12) {
-  const startDate = new Date();
-  startDate.setMonth(startDate.getMonth() - months);
-  
-  return this.aggregate([
-    {
-      $match: {
-        userId: new mongoose.Types.ObjectId(userId),
-        date: { $gte: startDate }
-      }
-    },
-    {
-      $group: {
-        _id: {
-          year: { $year: '$date' },
-          month: { $month: '$date' },
-          type: '$type'
-        },
-        total: { $sum: '$amount' },
-        count: { $sum: 1 }
-      }
-    },
-    {
-      $sort: { '_id.year': 1, '_id.month': 1 }
-    }
-  ]);
-};
 
-TransactionSchema.statics.getCategoryBreakdown = function(userId, startDate, endDate) {
-  return this.aggregate([
-    {
-      $match: {
-        userId: new mongoose.Types.ObjectId(userId),
-        date: { $gte: startDate, $lte: endDate }
-      }
-    },
-    {
-      $group: {
-        _id: {
-          type: '$type',
-          category: '$category'
-        },
-        total: { $sum: '$amount' },
-        count: { $sum: 1 },
-        avgAmount: { $avg: '$amount' }
-      }
-    },
-    {
-      $sort: { total: -1 }
-    }
-  ]);
-};
 
 module.exports = mongoose.model('Transaction', TransactionSchema);
