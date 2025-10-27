@@ -18,13 +18,18 @@ const mongoose = require('mongoose');
 
 const typeDefs = require('./graphql/TypeDefs');
 const resolvers = require('./graphql/resolvers');
+const { createContext } = require('./utils/auth');
 
 const PORT = process.env.PORT || 4000;
 
 async function startServer() {
 	const app = express();
 
-	const apolloServer = new ApolloServer({ typeDefs, resolvers });
+	const apolloServer = new ApolloServer({ 
+		typeDefs, 
+		resolvers,
+		context: createContext
+	});
 	await apolloServer.start();
 	apolloServer.applyMiddleware({ app, path: '/graphql' });
 

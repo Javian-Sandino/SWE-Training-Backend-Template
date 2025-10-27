@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-  "start": "node index.js",
-  "dev:start": "sh ./scripts/start.sh",
-  "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "dev:start": "sh ./scripts/start.sh",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -21,9 +21,11 @@
   "homepage": "https://github.com/heirynhr/SWE-Training-Backend-Template#readme",
   "dependencies": {
     "apollo-server-express": "^3.13.0",
+    "bcryptjs": "^3.0.2",
     "dotenv": "^17.2.3",
     "express": "^4.18.2",
     "graphql": "^16.11.0",
+    "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.20.0",
     "mongoose": "^8.18.0"
   }

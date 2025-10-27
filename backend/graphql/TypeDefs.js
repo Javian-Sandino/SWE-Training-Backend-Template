@@ -21,6 +21,7 @@ const typeDefs = gql`
 
     type Transaction {
         id: ID!
+        userId: ID!
         type: String!
         amount: Float!
         date: Date!
@@ -34,6 +35,7 @@ const typeDefs = gql`
 
     type Budget {
         id: ID!
+        userId: ID!
         month: String!
         category: String!
         limit: Float!
@@ -42,8 +44,14 @@ const typeDefs = gql`
         updatedAt: Date
     }
 
+    type AuthPayload {
+        token: String!
+        user: User!
+    }
+
     type Query {
         hello: String
+        me: User
         users: [User!]
         transactions(category: String, type: String, month: String): [Transaction!]
         budgets(month: String): [Budget!]
@@ -52,6 +60,18 @@ const typeDefs = gql`
     input ProfileInput {
         name: String
         bio: String
+    }
+
+    input RegisterInput {
+        username: String!
+        email: String!
+        password: String!
+        profile: ProfileInput
+    }
+
+    input LoginInput {
+        email: String!
+        password: String!
     }
 
     input CreateUserInput {
@@ -80,9 +100,12 @@ const typeDefs = gql`
     }
 
     type Mutation {
+        register(input: RegisterInput!): AuthPayload!
+        login(input: LoginInput!): AuthPayload!
         createUser(input: CreateUserInput!): User!
         createTransaction(input: CreateTransactionInput!): Transaction!
         createBudget(input: CreateBudgetInput!): Budget!
+        deleteTransaction(id: ID!): Boolean!
     }
 `;
 
