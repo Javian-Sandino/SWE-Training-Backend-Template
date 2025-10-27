@@ -49,13 +49,16 @@ const TransactionSchema = new mongoose.Schema(
       type: String,
       maxlength: [500, 'Notes cannot exceed 500 characters']
     },
-    tags: [{ 
-      type: String, 
-      index: true,
-      trim: true,
-      lowercase: true,
-      maxlength: [50, 'Tag cannot exceed 50 characters']
-    }],
+    tags: {
+      type: [{ 
+        type: String, 
+        index: true,
+        trim: true,
+        lowercase: true,
+        maxlength: [50, 'Tag cannot exceed 50 characters']
+      }],
+      default: []
+    },
     // Enhanced metadata
     isRecurring: {
       type: Boolean,

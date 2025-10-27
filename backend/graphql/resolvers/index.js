@@ -53,7 +53,12 @@ module.exports = {
                     if (args.offset) query.skip(args.offset);
                     
                     const docs = await query.lean();
-                    return docs.map(d => ({ id: d._id.toString(), ...d }));
+                    return docs.map(d => ({ 
+                        id: d._id.toString(), 
+                        ...d,
+                        tags: d.tags || [],
+                        paymentMethod: d.paymentMethod || 'other'
+                    }));
                 } catch (err) {
                     console.error('Failed to fetch transactions from DB:', err.message || err);
                     return [];
@@ -64,7 +69,12 @@ module.exports = {
                 requireAuth(user);
                 try {
                     const doc = await Transaction.findOne({ _id: id, userId: user.id }).lean();
-                    return doc ? { id: doc._id.toString(), ...doc } : null;
+                    return doc ? { 
+                        id: doc._id.toString(), 
+                        ...doc,
+                        tags: doc.tags || [],
+                        paymentMethod: doc.paymentMethod || 'other'
+                    } : null;
                 } catch (err) {
                     console.error('Failed to fetch transaction:', err.message || err);
                     return null;
@@ -79,7 +89,16 @@ module.exports = {
                 
                 try {
                     const docs = await Budget.find(filter).lean();
-                    return docs.map(d => ({ id: d._id.toString(), ...d }));
+                    return docs.map(d => ({ 
+                        id: d._id.toString(), 
+                        ...d,
+                        warningThreshold: d.warningThreshold || 80,
+                        criticalThreshold: d.criticalThreshold || 100,
+                        allowRollover: d.allowRollover || false,
+                        rolloverAmount: d.rolloverAmount || 0,
+                        isAutoAdjust: d.isAutoAdjust || false,
+                        autoAdjustPercentage: d.autoAdjustPercentage || 0
+                    }));
                 } catch (err) {
                     console.error('Failed to fetch budgets from DB:', err.message || err);
                     return [];
@@ -90,7 +109,16 @@ module.exports = {
                 requireAuth(user);
                 try {
                     const doc = await Budget.findOne({ _id: id, userId: user.id }).lean();
-                    return doc ? { id: doc._id.toString(), ...doc } : null;
+                    return doc ? { 
+                        id: doc._id.toString(), 
+                        ...doc,
+                        warningThreshold: doc.warningThreshold || 80,
+                        criticalThreshold: doc.criticalThreshold || 100,
+                        allowRollover: doc.allowRollover || false,
+                        rolloverAmount: doc.rolloverAmount || 0,
+                        isAutoAdjust: doc.isAutoAdjust || false,
+                        autoAdjustPercentage: doc.autoAdjustPercentage || 0
+                    } : null;
                 } catch (err) {
                     console.error('Failed to fetch budget:', err.message || err);
                     return null;
@@ -104,6 +132,12 @@ module.exports = {
                     return budgetsWithProgress.map(budget => ({
                         id: budget._id.toString(),
                         ...budget,
+                        warningThreshold: budget.warningThreshold || 80,
+                        criticalThreshold: budget.criticalThreshold || 100,
+                        allowRollover: budget.allowRollover || false,
+                        rolloverAmount: budget.rolloverAmount || 0,
+                        isAutoAdjust: budget.isAutoAdjust || false,
+                        autoAdjustPercentage: budget.autoAdjustPercentage || 0,
                         progress: budget.progress
                     }));
                 } catch (err) {
@@ -409,7 +443,12 @@ module.exports = {
                     });
                     const saved = await tx.save();
                     const d = saved.toObject();
-                    return { id: d._id.toString(), ...d };
+                    return { 
+                        id: d._id.toString(), 
+                        ...d,
+                        tags: d.tags || [],
+                        paymentMethod: d.paymentMethod || 'other'
+                    };
                 },
                 createBudget: async (_, { input }, { user }) => {
                     requireAuth(user);
@@ -448,7 +487,12 @@ module.exports = {
                             });
                         }
                         
-                        return { id: updated._id.toString(), ...updated };
+                        return { 
+                            id: updated._id.toString(), 
+                            ...updated,
+                            tags: updated.tags || [],
+                            paymentMethod: updated.paymentMethod || 'other'
+                        };
                     } catch (err) {
                         if (err instanceof GraphQLError) throw err;
                         console.error('Failed to update transaction:', err.message || err);
@@ -486,7 +530,13 @@ module.exports = {
                         });
                         
                         const saved = await duplicate.save();
-                        return { id: saved._id.toString(), ...saved.toObject() };
+                        const d = saved.toObject();
+                        return { 
+                            id: saved._id.toString(), 
+                            ...d,
+                            tags: d.tags || [],
+                            paymentMethod: d.paymentMethod || 'other'
+                        };
                     } catch (err) {
                         if (err instanceof GraphQLError) throw err;
                         console.error('Failed to duplicate transaction:', err.message || err);
